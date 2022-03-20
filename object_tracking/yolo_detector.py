@@ -13,14 +13,8 @@ import numpy as np
 class YOLOdetector:
     def __init__(self, image_dir, save_file_name="yolo_detections.pickle"):
         self.image_dir = image_dir
-        # smaller model
-        # self.cfg = '/Users/pramodanantharam/dev/bitbucket/objectdetection/yolov2-tiny.cfg'
-        # self.weights = '/Users/pramodanantharam/dev/bitbucket/objectdetection/yolov2-tiny.weights'
-        # larger model
-        self.cfg = "/Users/pramodanantharam/dev/bitbucket/objectdetection/yolov3.cfg"
-        self.weights = (
-            "/Users/pramodanantharam/dev/bitbucket/objectdetection/yolov3.weights"
-        )
+        self.cfg = "./data/yolov3.cfg"
+        self.weights = "./data/yolov3.weights"
         self.save_file_name = save_file_name
         self.image_size = 416
 

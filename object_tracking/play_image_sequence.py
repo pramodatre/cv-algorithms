@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 # GT XML file: http://www.milanton.de/data/ (http://www.milanton.de/files/gt/PETS2009/PETS2009-S2L1.xml)
 # Image sequence: http://cs.binghamton.edu/~mrldata/pets2009 (http://cs.binghamton.edu/~mrldata/public/PETS2009/S2_L1.tar.bz2)
 # Example command:
-# python play_image_sequence.py --image_dir '/Users/pramodanantharam/dev/data/pets2009/Crowd_PETS09/S2/L1/Time_12-34/View_001' --gt '/Users/pramodanantharam/dev/data/pets2009/PETS2009-S2L1.xml'
+# python play_image_sequence.py --image_dir './data/Crowd_PETS09/S2/L1/Time_12-34/View_001' --gt './data/PETS2009-S2L1.xml'
 
 # Annotations GT from: http://www.milanton.de/data/
 parser = argparse.ArgumentParser()

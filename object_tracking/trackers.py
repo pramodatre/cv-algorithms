@@ -18,7 +18,7 @@ from abc import ABC, abstractclassmethod
 # Image sequence: http://cs.binghamton.edu/~mrldata/pets2009 (http://cs.binghamton.edu/~mrldata/public/PETS2009/S2_L1.tar.bz2)
 
 # Sample invocation
-# python track_objects.py --image_dir '/Users/pramodanantharam/dev/data/pets2009/Crowd_PETS09/S2/L1/Time_12-34/View_001' --gt '/Users/pramodanantharam/dev/data/pets2009/PETS2009-S2L1.xml'
+# python trackers.py --image_dir './data/Crowd_PETS09/S2/L1/Time_12-34/View_001' --gt './data/PETS2009-S2L1.xml'
 
 
 class Frame:
@@ -50,6 +50,9 @@ class FrameDataReader:
     ) -> None:
         self.frames = []
         if not os.path.exists(saved_detections_file):
+            print(
+                f"Could not find saved detections file: {saved_detections_file}. Will have to run YOLO on your machine which may be slow the first time. Results will be cached for future runs."
+            )
             yolo = YOLOdetector(image_dir)
             yolo.run()
         else:
@@ -252,7 +255,7 @@ class DetectionBasedTracker(TrackingStrategy):
         print(self.frames)
         self.o_id_count = 1
         self.o_ids_without_updates_counts = defaultdict(lambda: 0)
-        self.STALE_DET_THREDHOLD_FRAMES = 10
+        self.STALE_DET_THRESHOLD_FRAMES = 10
 
     def compute_iou_score(self, bbox1, bbox2):
         """Returns Intersection over Union (IoU) score for two
@@ -279,6 +282,18 @@ class DetectionBasedTracker(TrackingStrategy):
         return iou
 
     def predict_object_continuation_using_bipartite_matching(self, cur_det, obj_map):
+        """Connect objects in previous frame (obj_map) to objects in
+        the current frame (cur_det) using an optimization technique.
+
+        Args:
+            cur_det (list): Containing Detection objects; one
+                detection object per detection
+            obj_map (dict): Containing object_id as key and
+                corresponding bounding box as value
+
+        Returns:
+            dict: Updated obj_map
+        """
         if not obj_map:
             # First frame
             for det in cur_det:
@@ -325,7 +340,7 @@ class DetectionBasedTracker(TrackingStrategy):
 
         Args:
             cur_obj_map (dict): Object id and corresponding
-                        detection bouding box
+                        detection bounding box
             prev_obj_map (dict): Previous frame object id and
                          corresponding bounding box
 
@@ -342,7 +357,7 @@ class DetectionBasedTracker(TrackingStrategy):
         for cur_id in self.o_ids_without_updates_counts:
             if (
                 self.o_ids_without_updates_counts[cur_id]
-                > self.STALE_DET_THREDHOLD_FRAMES
+                > self.STALE_DET_THRESHOLD_FRAMES
             ):
                 keys_to_remove.append(cur_id)
 
@@ -420,9 +435,6 @@ if __name__ == "__main__":
         "--image_dir",
         required=True,
         help="Specify the directory containing image sequence",
-    )
-    parser.add_argument(
-        "--gt", required=False, help="Specify the GT file if any for the image sequence"
     )
     args = parser.parse_args()
     tracker = Tracker(BaselineTracker(args.image_dir))
